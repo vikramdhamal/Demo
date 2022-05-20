@@ -1,4 +1,4 @@
----
+
 - hosts: 172.31.20.153
   vars:
      list:
@@ -58,7 +58,7 @@
             state: absent
             
             
-- hosts: 192.168.70.10
+- hosts: 172.31.20.153
   tasks:
     - yum:
         name: httpd
@@ -66,6 +66,6 @@
     - service:
         name: httpd
         state: started
-...    
+   
         
        
