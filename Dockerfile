@@ -1,4 +1,8 @@
-FROM centos:7
-RUN yum install openssh* -y
+FROM centos:8
+RUN apt-get update
 EXPOSE 22
-ENTRYPOINT service sshd restart && /bin/bash
+RUN ip a
+RUN mkdir project
+RUN dir /project
+ADD test.txt /project/
+VOLUME /project
