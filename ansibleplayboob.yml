@@ -1,54 +1,56 @@
-
+---
 - hosts: 172.31.20.153
   vars:
-     list:
-       - mariadb
-       - mariadb-server
-       - MySQL-python
-  task:
-     - name: "install epel-release"
-       yum:
-         name: "epel-rlease"
-         state: latest
-     - name: "install mareadb"
-       yum:
-       name: "{{}list}"
-       state: latest
-       
-     - name: "start service"
-       services:
-         name: mariadb
-         state: started
-       register: service_start
-       
-     - name: "install python"
-       yum:
-         name: python-pip
-         state: lstest
-      - sheel: "pip instsll pymysql"
-      
-      - name: Sets the root 
-        mysql_user: user=root password="readhat" host=localhost
-        when: service_start.changed
-        
-      - name: create customer database
-        shell: mysql -uroot -predhat -e "create database customer"
-        when: service_start.changed
-        
-        
-      - name: Create info table inside customer database
+    list:
+      - mariadb
+      - mariadb-server
+      - MySQL-python
+  tasks:
+    - block:
+        - name: "Install epel-release"
+          yum:
+            name: "epel-release"
+            state: latest
+        - name: "Install mariadb"
+          yum:
+            name: "{{list}}"
+            state: latest
+
+        - name: "Start service"
+          service:
+            name: mariadb
+            state: started
+          register: service_start
+
+
+        - name: "Install pip"
+          yum:
+            name: python-pip
+            state: latest
+
+        - shell: "pip install pymysql"
+
+        - name: Sets the root password 
+          mysql_user: user=root password="redhat" host=localhost
+          when: service_start.changed
+
+        - name: Create customer database
+          shell: mysql -uroot -predhat -e "create database customer"
+          when: service_start.changed
+
+        - name: Create info table inside customer database
           shell: mysql -uroot -predhat -e "create table customer.info(fname varchar(20), lname varchar(20))"
           when: service_start.changed
 
-      - name: Insert details into customer.info table -
-           shell: mysql -uroot -predhat -e "insert into customer.info values('raj','sharma')"
-           when: service_start.changed
+        - name: Insert details into customer.info table -
+          shell: mysql -uroot -predhat -e "insert into customer.info values('raj','sharma')"
+          when: service_start.changed
           
-      - name: Allow root access from anywhere
-           shell: mysql -uroot -predhat -e "CREATE USER 'root'@'%' IDENTIFIED BY 'redhat'; GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';FLUSH PRIVILEGES;"
-           when: service_start.changed
+        - name: Allow root access from anywhere
+          shell: mysql -uroot -predhat -e "CREATE USER 'root'@'%' IDENTIFIED BY 'redhat'; GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';FLUSH PRIVILEGES;"
+          when: service_start.changed
 
-   rescue:
+      rescue:
         - name: Remove Packages
           yum:
             name: "{{list}}"
@@ -56,8 +58,7 @@
         - file:
             name: "/var/lib/mysql"
             state: absent
-            
-            
+
 - hosts: 172.31.20.153
   tasks:
     - yum:
@@ -66,6 +67,4 @@
     - service:
         name: httpd
         state: started
-   
-        
-       
+...
