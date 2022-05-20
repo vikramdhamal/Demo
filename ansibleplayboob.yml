@@ -1,5 +1,6 @@
 ---
-- hosts: 172.31.20.153
+- name: "Play1"
+  hosts: 172.31.20.153
   vars:
     list:
       - mariadb
