@@ -1,4 +1,4 @@
-FROM centos:8
+FROM centos:7
 
 EXPOSE 22
 RUN ip a
